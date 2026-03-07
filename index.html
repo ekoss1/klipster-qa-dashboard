@@ -16,39 +16,39 @@
         }
 
         :root {
-            --bg-primary: #08090E;
-            --bg-secondary: #0F1117;
-            --bg-tertiary: #181A24;
-            --bg-card: #141620;
-            --bg-hover: #1E2030;
-            --text-primary: #F0F1F5;
-            --text-secondary: #B0B3C0;
-            --text-muted: #6B6F80;
-            --accent-user: #E040A0;
-            --accent-agent: #40A0E0;
-            --accent-web: #A070F0;
-            --accent-ios: #34D399;
-            --accent-android: #3B82F6;
-            --accent-danger: #EF4444;
+            --bg-primary: #F7F7F7;
+            --bg-secondary: #FFFFFF;
+            --bg-tertiary: #F2F2F2;
+            --bg-card: #FFFFFF;
+            --bg-hover: #FAFAFA;
+            --text-primary: #222222;
+            --text-secondary: #484848;
+            --text-muted: #717171;
+            --accent-user: #FF385C;
+            --accent-agent: #006D77;
+            --accent-web: #5E60CE;
+            --accent-ios: #2EBD85;
+            --accent-android: #3A86FF;
+            --accent-danger: #D93025;
             --accent-warning: #F59E0B;
-            --accent-success: #10B981;
-            --border-color: #262838;
-            --shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-            --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.5);
+            --accent-success: #2EBD85;
+            --border-color: #E8E8E8;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 6px 16px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 18px 45px rgba(0, 0, 0, 0.16);
         }
 
-        [data-theme="light"] {
-            --bg-primary: #F5F5F8;
-            --bg-secondary: #FFFFFF;
-            --bg-tertiary: #EAEAF0;
-            --bg-card: #FFFFFF;
-            --bg-hover: #F0F0F5;
-            --text-primary: #111827;
-            --text-secondary: #4B5563;
-            --text-muted: #9CA3AF;
-            --border-color: #E0E0E8;
-            --shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-            --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+        [data-theme="dark"] {
+            --bg-primary: #0E1015;
+            --bg-secondary: #171A22;
+            --bg-tertiary: #1E2230;
+            --bg-card: #171A22;
+            --bg-hover: #212636;
+            --text-primary: #F0F1F5;
+            --text-secondary: #B8BBC7;
+            --text-muted: #7E8396;
+            --border-color: #2A3042;
+            --shadow: 0 2px 12px rgba(0, 0, 0, 0.38);
+            --shadow-lg: 0 12px 38px rgba(0, 0, 0, 0.5);
         }
 
         body {
@@ -57,70 +57,99 @@
             color: var(--text-primary);
             min-height: 100vh;
             transition: all 0.3s;
+            background-image:
+                radial-gradient(circle at 8% 0%, rgba(255, 56, 92, 0.07), transparent 33%),
+                radial-gradient(circle at 92% 0%, rgba(94, 96, 206, 0.06), transparent 32%);
         }
 
         /* ========== HEADER ========== */
         .header {
-            background: var(--bg-secondary);
+            background: rgba(247, 247, 247, 0.92);
             border-bottom: 1px solid var(--border-color);
-            padding: 0.75rem 2rem;
+            padding: 0.85rem 1.4rem;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: var(--shadow);
+            backdrop-filter: blur(10px);
         }
 
         .header-content {
-            max-width: 1600px;
+            max-width: 1380px;
             margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
             align-items: center;
+            gap: 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 0.65rem 0.85rem;
+            box-shadow: var(--shadow);
         }
 
         .logo-section {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.8rem;
+            min-width: 0;
         }
 
         .logo {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--accent-user), var(--accent-agent));
-            border-radius: 8px;
+            width: 118px;
+            height: 30px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 800;
-            color: white;
+            justify-content: flex-start;
+            overflow: hidden;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: left center;
         }
 
         .brand {
-            font-size: 1.3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--accent-user), var(--accent-agent), var(--accent-web));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.15;
+            white-space: nowrap;
         }
 
         .header-actions {
             display: flex;
-            gap: 0.75rem;
+            gap: 0.45rem;
             align-items: center;
+            justify-content: flex-end;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+        }
+        .header-actions::-webkit-scrollbar { display: none; }
+
+        [data-theme="dark"] .header {
+            background: rgba(14, 16, 21, 0.92);
         }
 
         .stats-bar {
             display: flex;
-            gap: 1.5rem;
-            font-size: 0.8rem;
+            gap: 0.45rem;
+            font-size: 0.78rem;
+            flex-wrap: nowrap;
         }
 
         .stat-item {
             display: flex;
             align-items: center;
             gap: 0.4rem;
+            padding: 0.38rem 0.56rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 999px;
+            white-space: nowrap;
         }
 
         .stat-value {
@@ -130,17 +159,18 @@
 
         .stat-label {
             color: var(--text-muted);
-            font-size: 0.75rem;
+            font-size: 0.73rem;
         }
 
         .theme-toggle {
-            background: var(--bg-tertiary);
+            background: var(--bg-secondary);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            padding: 0.4rem 0.75rem;
-            border-radius: 6px;
+            padding: 0.55rem 0.85rem;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
             transition: all 0.2s;
         }
 
@@ -150,9 +180,9 @@
 
         /* ========== LAYOUT ========== */
         .container {
-            max-width: 1600px;
-            margin: 1.5rem auto;
-            padding: 0 2rem;
+            max-width: 1380px;
+            margin: 1rem auto 1.8rem;
+            padding: 0 1.4rem;
         }
 
         /* ========== ROLE TABS ========== */
@@ -334,17 +364,19 @@
         }
 
         .btn {
-            padding: 0.55rem 1rem;
+            padding: 0.5rem 0.82rem;
             border: none;
-            border-radius: 7px;
+            border-radius: 10px;
             font-weight: 600;
             font-size: 0.8rem;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            justify-content: center;
+            min-height: 36px;
             font-family: inherit;
+            white-space: nowrap;
         }
 
         .btn-secondary {
@@ -358,12 +390,13 @@
         }
 
         .btn-reset {
-            background: var(--accent-danger);
-            color: white;
+            background: #fff0ef;
+            color: var(--accent-danger);
+            border: 1px solid #ffc8c4;
         }
 
         .btn-reset:hover {
-            opacity: 0.9;
+            background: #ffe2e0;
         }
 
         /* ========== SUMMARY CARDS ========== */
@@ -433,10 +466,11 @@
         .feature-section {
             background: var(--bg-secondary);
             border: 1px solid var(--border-color);
-            border-radius: 10px;
-            margin-bottom: 0.75rem;
+            border-radius: 14px;
+            margin-bottom: 0.95rem;
             overflow: hidden;
             animation: fadeIn 0.3s ease-out;
+            box-shadow: var(--shadow);
         }
 
         .feature-header {
@@ -524,7 +558,7 @@
         .test-step {
             display: flex;
             gap: 0.75rem;
-            padding: 0.85rem 1.25rem;
+            padding: 0.95rem 1.25rem;
             border-bottom: 1px solid var(--border-color);
             align-items: flex-start;
             transition: background 0.15s;
@@ -727,12 +761,27 @@
             }
 
             .header-content {
-                flex-direction: column;
+                grid-template-columns: 1fr;
                 gap: 0.75rem;
+                align-items: stretch;
             }
 
             .stats-bar {
                 flex-wrap: wrap;
+            }
+
+            .logo-section {
+                min-width: auto;
+            }
+
+            .logo {
+                width: 132px;
+                height: 32px;
+            }
+
+            .header-actions {
+                justify-content: flex-start;
+                flex-wrap: nowrap;
             }
 
             .action-bar {
@@ -835,6 +884,25 @@
             align-items: center;
             flex-shrink: 0;
             margin-top: 2px;
+        }
+
+        .step-linear-btn {
+            border: 1px solid rgba(255, 56, 92, 0.35);
+            background: rgba(255, 56, 92, 0.08);
+            color: var(--accent-user);
+            border-radius: 999px;
+            font-size: 0.64rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            padding: 0.18rem 0.52rem;
+            cursor: pointer;
+            font-family: inherit;
+            line-height: 1.2;
+            white-space: nowrap;
+        }
+
+        .step-linear-btn:hover {
+            background: rgba(255, 56, 92, 0.16);
         }
 
         /* ========== ISSUE NOTES (COMMENTS) ========== */
@@ -1292,11 +1360,13 @@
     </style>
 </head>
 
-<body data-theme="dark">
+<body data-theme="light">
     <header class="header">
         <div class="header-content">
             <div class="logo-section">
-                <div class="logo">K</div>
+                <div class="logo">
+                    <img src="./assets/klipster-logo.png" alt="Klipster official logo">
+                </div>
                 <h1 class="brand">Klipster QA Dashboard</h1>
             </div>
             <div class="header-actions">
@@ -1314,11 +1384,12 @@
                         <span class="stat-value" style="color:var(--accent-danger)" id="failedTests">0</span>
                     </div>
                 </div>
-                <button class="btn btn-secondary" onclick="exportData()">📥 Export</button>
-                <button class="btn btn-secondary" onclick="importData()">📤 Import</button>
+                <button class="btn btn-secondary" onclick="exportCsvForSheets()">Export</button>
+                <button class="btn btn-secondary" onclick="exportData()">Export JSON</button>
+                <button class="btn btn-secondary" onclick="importData()">Import</button>
                 <button class="btn btn-secondary" onclick="scrollToBugLog()">Bug Log <span class="header-badge" id="bugCountBadge">0</span></button>
-                <button class="btn btn-reset" onclick="resetAll()">🗑️ Reset</button>
-                <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
+                <button class="btn btn-reset" onclick="resetAll()">Reset</button>
+                <button class="theme-toggle" onclick="toggleTheme()">Theme</button>
             </div>
         </div>
     </header>
@@ -1944,7 +2015,7 @@
         // INIT
         // =============================================
         document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const savedTheme = localStorage.getItem('theme') || 'light';
             document.body.setAttribute('data-theme', savedTheme);
             ['linearTitle', 'linearObserved', 'linearExtraNotes', 'linearSeverity'].forEach(id => {
                 const el = document.getElementById(id);
@@ -2018,6 +2089,7 @@
             <div class="step-actions-col">
                 <button class="step-status-btn ${status}" onclick="cycleStatus('${statusKey}')" title="Pass → Fail → Skip → Clear">${statusIcon}</button>
                 <button class="comment-btn ${comment ? 'has-comment' : ''}" onclick="toggleCommentEdit('${statusKey}')" title="${comment ? 'Edit note' : 'Add note'}">${comment ? '💬' : '✏️'}</button>
+                            <button class="step-linear-btn" onclick="openLinearModal('${statusKey}','${featureKey}',${stepIdx},${isCustom})" title="Generate Linear issue">Linear</button>
             </div>
         </div>`;
         }
@@ -2026,6 +2098,9 @@
             const container = document.getElementById('featuresContainer');
             const search = document.getElementById('searchInput').value.toLowerCase();
             const data = TEST_DATA[currentRole] || [];
+            const openFeatureIds = new Set(
+                Array.from(document.querySelectorAll('.feature-body.open')).map(el => el.id)
+            );
 
             let filtered = data.filter(f => {
                 if (currentPriority !== 'all' && f.priority !== currentPriority) return false;
@@ -2113,6 +2188,12 @@
                 </div>`;
                 }).join('');
             }
+            openFeatureIds.forEach(id => {
+                const body = document.getElementById(id);
+                const arrow = document.getElementById('arrow_' + id);
+                if (body) body.classList.add('open');
+                if (arrow) arrow.classList.add('open');
+            });
             updateStats();
             updateBugLog();
         }
@@ -2448,6 +2529,83 @@
             a.click(); URL.revokeObjectURL(url);
         }
 
+        function csvCell(v) {
+            const s = String(v == null ? '' : v);
+            return `"${s.replace(/"/g, '""')}"`;
+        }
+
+        function exportCsvForSheets() {
+            const rows = [];
+            rows.push([
+                'Role',
+                'Feature',
+                'Step #',
+                'Type',
+                'Action',
+                'Expected',
+                'Priority',
+                'Platforms',
+                'Status',
+                'Comment',
+                'Step Key'
+            ]);
+
+            ['user', 'agent', 'web'].forEach(role => {
+                (TEST_DATA[role] || []).forEach((feature, fi) => {
+                    const featureKey = `${role}_${fi}`;
+                    const deletedSet = new Set(deletedSteps[featureKey] || []);
+                    const csteps = customSteps[featureKey] || [];
+                    let stepNumber = 0;
+
+                    feature.steps.forEach((s, si) => {
+                        if (deletedSet.has(si)) return;
+                        stepNumber++;
+                        const key = `${featureKey}_${si}`;
+                        rows.push([
+                            role,
+                            feature.feature,
+                            stepNumber,
+                            'original',
+                            s.action,
+                            s.expected,
+                            feature.priority,
+                            (feature.platforms || []).join(','),
+                            stepStatuses[key] || 'not_tested',
+                            stepComments[key] || '',
+                            key
+                        ]);
+                    });
+
+                    csteps.forEach((s, ci) => {
+                        stepNumber++;
+                        const key = `${featureKey}_custom_${ci}`;
+                        rows.push([
+                            role,
+                            feature.feature,
+                            stepNumber,
+                            'custom',
+                            s.action,
+                            s.expected,
+                            feature.priority,
+                            (feature.platforms || []).join(','),
+                            stepStatuses[key] || 'not_tested',
+                            stepComments[key] || '',
+                            key
+                        ]);
+                    });
+                });
+            });
+
+            const csv = '\uFEFF' + rows.map(r => r.map(csvCell).join(',')).join('\n');
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `klipster_qa_sheet_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
         function importData() {
             const input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
             input.onchange = e => {
@@ -2483,4 +2641,7 @@
 </body>
 
 </html>
+
+
+
 

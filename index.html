@@ -618,6 +618,10 @@
             line-height: 1.5;
         }
 
+        .step-expected.editable {
+            cursor: pointer;
+        }
+
         .step-expected strong {
             color: var(--text-secondary);
             font-weight: 600;
@@ -862,6 +866,30 @@
             background: rgba(239, 68, 68, 0.1);
         }
 
+        .edit-step-btn {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            padding: 0.1rem 0.25rem;
+            border-radius: 4px;
+            opacity: 0.85;
+            transition: all 0.15s;
+            flex-shrink: 0;
+            line-height: 1;
+        }
+
+        .test-step:hover .edit-step-btn {
+            opacity: 1;
+        }
+
+        .edit-step-btn:hover {
+            opacity: 1 !important;
+            color: var(--accent-agent);
+            background: rgba(0, 109, 119, 0.1);
+        }
+
         .step-custom-badge {
             display: inline-block;
             font-size: 0.58rem;
@@ -1027,6 +1055,43 @@
         .comment-btn.has-comment {
             border-color: var(--accent-warning);
             background: rgba(245, 158, 11, 0.1);
+        }
+
+        .step-edit-area {
+            margin-top: 0.55rem;
+            padding: 0.55rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-tertiary);
+            display: none;
+        }
+
+        .step-edit-area.open {
+            display: block;
+        }
+
+        .step-edit-input,
+        .step-edit-textarea {
+            width: 100%;
+            padding: 0.45rem 0.65rem;
+            border: 1px solid var(--border-color);
+            border-radius: 7px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.78rem;
+            font-family: inherit;
+            margin-bottom: 0.45rem;
+        }
+
+        .step-edit-textarea {
+            min-height: 56px;
+            resize: vertical;
+        }
+
+        .step-edit-input:focus,
+        .step-edit-textarea:focus {
+            outline: none;
+            border-color: var(--accent-agent);
         }
 
         /* ========== ADD STEP ========== */
@@ -1992,6 +2057,7 @@
         let stepComments = JSON.parse(localStorage.getItem('klipster_step_comments') || '{}');
         let customSteps = JSON.parse(localStorage.getItem('klipster_custom_steps') || '{}');
         let deletedSteps = JSON.parse(localStorage.getItem('klipster_deleted_steps') || '{}');
+        let stepEdits = JSON.parse(localStorage.getItem('klipster_step_edits') || '{}');
         let bugReports = JSON.parse(localStorage.getItem('klipster_bug_reports') || '[]');
         let linearContext = null;
 
@@ -2006,6 +2072,7 @@
             localStorage.setItem('klipster_step_comments', JSON.stringify(stepComments));
             localStorage.setItem('klipster_custom_steps', JSON.stringify(customSteps));
             localStorage.setItem('klipster_deleted_steps', JSON.stringify(deletedSteps));
+            localStorage.setItem('klipster_step_edits', JSON.stringify(stepEdits));
         }
         function saveBugReports() {
             localStorage.setItem('klipster_bug_reports', JSON.stringify(bugReports));
@@ -2058,10 +2125,20 @@
         // =============================================
         // RENDER
         // =============================================
+        function getStepWithEdits(stepObj, statusKey) {
+            const edited = stepEdits[statusKey];
+            if (!edited) return stepObj;
+            return {
+                action: edited.action || stepObj.action,
+                expected: edited.expected || stepObj.expected
+            };
+        }
+
         function renderStepHtml(s, stepNum, statusKey, stepClass, featureKey, isCustom, stepIdx) {
             const status = stepStatuses[statusKey] || '';
             const comment = stepComments[statusKey] || '';
             const statusIcon = status === 'pass' ? '✅' : status === 'fail' ? '❌' : status === 'skip' ? '⏭️' : '';
+            const displayStep = getStepWithEdits(s, statusKey);
             const deleteFn = isCustom
                 ? `deleteCustomStep('${featureKey}',${stepIdx})`
                 : `deleteOriginalStep('${featureKey}',${stepIdx})`;
@@ -2071,11 +2148,20 @@
             <div class="step-number ${stepClass}">${stepNum}</div>
             <div class="step-content">
                 <div class="step-action-row">
-                    <span class="step-action">${esc(s.action)}</span>
+                    <span class="step-action">${esc(displayStep.action)}</span>
                     ${isCustom ? '<span class="step-custom-badge">custom</span>' : ''}
+                    <button class="edit-step-btn" onclick="event.stopPropagation();toggleStepEdit('${statusKey}')" title="Edit step">Edit</button>
                     <button class="delete-step-btn" onclick="event.stopPropagation();${deleteFn}" title="Remove step">🗑</button>
                 </div>
-                <div class="step-expected"><strong>Expected:</strong> ${esc(s.expected)}</div>
+                <div class="step-expected editable" ondblclick="toggleStepEdit('${statusKey}')" title="Double-click to edit"><strong>Expected:</strong> ${esc(displayStep.expected)}</div>
+                <div class="step-edit-area" id="sedit_${statusKey}">
+                    <input class="step-edit-input" id="saction_${statusKey}" type="text" placeholder="Step action..." value="${esc(displayStep.action)}" />
+                    <textarea class="step-edit-textarea" id="sexpected_${statusKey}" placeholder="Expected behavior...">${esc(displayStep.expected)}</textarea>
+                    <div class="step-comment-actions">
+                        <button class="btn-cancel-comment" onclick="cancelStepEdit('${statusKey}')">Cancel</button>
+                        <button class="btn-save-comment" onclick="saveStepEdit('${statusKey}')">Save Step</button>
+                    </div>
+                </div>
                 ${comment ? `<div class="step-comment-area"><div class="step-comment-text">${esc(comment)}</div></div>` : ''}
                 <div class="step-comment-edit" id="cedit_${statusKey}" style="display:none;">
                     <textarea class="step-comment-input" id="cinput_${statusKey}" placeholder="Describe the issue, bug, or observation...">${esc(comment)}</textarea>
@@ -2089,7 +2175,7 @@
             <div class="step-actions-col">
                 <button class="step-status-btn ${status}" onclick="cycleStatus('${statusKey}')" title="Pass → Fail → Skip → Clear">${statusIcon}</button>
                 <button class="comment-btn ${comment ? 'has-comment' : ''}" onclick="toggleCommentEdit('${statusKey}')" title="${comment ? 'Edit note' : 'Add note'}">${comment ? '💬' : '✏️'}</button>
-                            <button class="step-linear-btn" onclick="openLinearModal('${statusKey}','${featureKey}',${stepIdx},${isCustom})" title="Generate Linear issue">Linear</button>
+                <button class="step-linear-btn" onclick="openLinearModal('${statusKey}','${featureKey}',${stepIdx},${isCustom})" title="Generate Linear issue">Linear</button>
             </div>
         </div>`;
         }
@@ -2238,12 +2324,42 @@
             if (el) el.style.display = 'none';
         }
 
+        function toggleStepEdit(statusKey) {
+            const el = document.getElementById('sedit_' + statusKey);
+            if (!el) return;
+            el.classList.toggle('open');
+        }
+
+        function cancelStepEdit(statusKey) {
+            const box = document.getElementById('sedit_' + statusKey);
+            if (!box) return;
+            box.classList.remove('open');
+            renderAll();
+        }
+
+        function saveStepEdit(statusKey) {
+            const actionEl = document.getElementById('saction_' + statusKey);
+            const expectedEl = document.getElementById('sexpected_' + statusKey);
+            if (!actionEl || !expectedEl) return;
+            const action = actionEl.value.trim();
+            const expected = expectedEl.value.trim();
+            if (!action) {
+                actionEl.style.borderColor = 'var(--accent-danger)';
+                actionEl.focus();
+                return;
+            }
+            stepEdits[statusKey] = { action, expected: expected || '—' };
+            saveState();
+            renderAll();
+        }
+
         function findStepContext(statusKey, featureKey, stepIdx, isCustom) {
             const role = featureKey.split('_')[0];
             const roleIdx = parseInt(featureKey.split('_')[1], 10);
             const roleData = TEST_DATA[role] || [];
             const feature = roleData[roleIdx];
-            const step = isCustom ? (customSteps[featureKey] || [])[stepIdx] : (feature ? feature.steps[stepIdx] : null);
+            const baseStep = isCustom ? (customSteps[featureKey] || [])[stepIdx] : (feature ? feature.steps[stepIdx] : null);
+            const step = baseStep ? getStepWithEdits(baseStep, statusKey) : null;
             if (!feature || !step) return null;
             return {
                 statusKey,
@@ -2427,12 +2543,14 @@
             if (!steps) return;
             delete stepStatuses[`${featureKey}_custom_${customIdx}`];
             delete stepComments[`${featureKey}_custom_${customIdx}`];
+            delete stepEdits[`${featureKey}_custom_${customIdx}`];
             steps.splice(customIdx, 1);
             for (let i = customIdx; i < steps.length; i++) {
                 const oldKey = `${featureKey}_custom_${i + 1}`;
                 const newKey = `${featureKey}_custom_${i}`;
                 if (stepStatuses[oldKey]) { stepStatuses[newKey] = stepStatuses[oldKey]; delete stepStatuses[oldKey]; }
                 if (stepComments[oldKey]) { stepComments[newKey] = stepComments[oldKey]; delete stepComments[oldKey]; }
+                if (stepEdits[oldKey]) { stepEdits[newKey] = stepEdits[oldKey]; delete stepEdits[oldKey]; }
             }
             saveState();
             renderAll();
@@ -2521,7 +2639,7 @@
         // EXPORT / IMPORT / RESET
         // =============================================
         function exportData() {
-            const payload = { stepStatuses, stepComments, customSteps, deletedSteps, bugReports, exportDate: new Date().toISOString(), version: '3.1' };
+            const payload = { stepStatuses, stepComments, customSteps, deletedSteps, stepEdits, bugReports, exportDate: new Date().toISOString(), version: '3.2' };
             const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url;
@@ -2561,13 +2679,14 @@
                         if (deletedSet.has(si)) return;
                         stepNumber++;
                         const key = `${featureKey}_${si}`;
+                        const step = getStepWithEdits(s, key);
                         rows.push([
                             role,
                             feature.feature,
                             stepNumber,
                             'original',
-                            s.action,
-                            s.expected,
+                            step.action,
+                            step.expected,
                             feature.priority,
                             (feature.platforms || []).join(','),
                             stepStatuses[key] || 'not_tested',
@@ -2579,13 +2698,14 @@
                     csteps.forEach((s, ci) => {
                         stepNumber++;
                         const key = `${featureKey}_custom_${ci}`;
+                        const step = getStepWithEdits(s, key);
                         rows.push([
                             role,
                             feature.feature,
                             stepNumber,
                             'custom',
-                            s.action,
-                            s.expected,
+                            step.action,
+                            step.expected,
                             feature.priority,
                             (feature.platforms || []).join(','),
                             stepStatuses[key] || 'not_tested',
@@ -2617,6 +2737,7 @@
                         if (d.stepComments) stepComments = { ...stepComments, ...d.stepComments };
                         if (d.customSteps) customSteps = { ...customSteps, ...d.customSteps };
                         if (d.deletedSteps) deletedSteps = { ...deletedSteps, ...d.deletedSteps };
+                        if (d.stepEdits) stepEdits = { ...stepEdits, ...d.stepEdits };
                         if (Array.isArray(d.bugReports)) bugReports = [...d.bugReports, ...bugReports];
                         saveState();
                         saveBugReports();
@@ -2631,8 +2752,8 @@
 
         function resetAll() {
             if (confirm('Reset ALL test progress, notes, and custom steps? This cannot be undone.')) {
-                stepStatuses = {}; stepComments = {}; customSteps = {}; deletedSteps = {};
-                ['klipster_step_statuses', 'klipster_step_comments', 'klipster_custom_steps', 'klipster_deleted_steps']
+                stepStatuses = {}; stepComments = {}; customSteps = {}; deletedSteps = {}; stepEdits = {};
+                ['klipster_step_statuses', 'klipster_step_comments', 'klipster_custom_steps', 'klipster_deleted_steps', 'klipster_step_edits']
                     .forEach(k => localStorage.removeItem(k));
                 renderAll();
             }
@@ -2641,6 +2762,7 @@
 </body>
 
 </html>
+
 
 
 
